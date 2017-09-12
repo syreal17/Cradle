@@ -4,15 +4,12 @@ package body send_task_lib is
       ServerSocket : GS.Socket_Type;
       ClientStreams : Cxn_Streams;
       ClientStreams_I : Positive;
-      Acpt : Accept_Task;
-      SendMsg : String(1..64);
       SendMsg_N : Positive := 1;
    begin
       accept Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive) do
          ServerSocket := ServerSocketInit;
          ClientStreams := CSs;
          ClientStreams_I := CSs_I;
-         Acpt.Construct(ServerSocket, ClientStreams, ClientStreams_I);
       end Construct;
    
       <<Send_Update_Loop_Label>>
@@ -23,37 +20,33 @@ package body send_task_lib is
             cons.Put_Line("INFO: Clients Updated in Send Task");
          or
             delay 0.01;
-            if ClientStreams_I <= 1 then
-               goto Send_Update_Loop_Label;
-            else
-               --send message as string to client
-               declare
-                  --SendMsg : String := cons.Get_Line & LF;
-                  C : Character;
-                  ClientStream : GS.Stream_Access;
-               begin
-                  cons.Get_Immediate(C);
-                  SendMsg(SendMsg_N) := C;
-                  SendMsg_N := SendMsg_N + 1;
-                  if C = LF or SendMsg_N = SendMsg'Last then
-                     declare
-                        Msg : String(1..SendMsg_N-1);
-                     begin
-                        --copy truncated string
-                        for I in Msg'Range loop
-                           Msg(I) := SendMsg(I);
-                        end loop;
-                        
-                        for I in 1 .. ClientStreams_I-1 loop
-                           ClientStream := ClientStreams(I);
-                           String'Write(ClientStream, Msg);
-                        end loop;
-                        --reset SendMsg_N, and SendMsg
-                        SendMsg_N := 1;
-                     end;
-                  end if;
-               end;
-            end if;
+            select
+               accept Relay_Msg(SendMsg : String(1..64)) do
+                  SendMsg_N := SendMsg'Last;
+                  for I in SendMsg'Range loop
+                     if SendMsg(I) = LF then
+                        SendMsg_N = I;
+                        exit;
+                     end if;
+                  end loop;
+                  
+                  declare
+                     ClientStream : GS.Stream_Access;
+                     Msg : String(1..SendMsg_N);
+                  begin
+                     for I in Msg'Range loop
+                        Msg(I) := SendMsg(I);
+                     end loop;
+                     
+                     for I in 1..ClientStreams_I-1 loop
+                        ClientStream := ClientStreams(I);
+                        String'Write(ClientStream, Msg);
+                     end loop;
+                  end;
+               end Relay_Msg;
+            or
+               delay 0.01;
+            end select;
          end select;
       end loop Send_Update_Loop;
       

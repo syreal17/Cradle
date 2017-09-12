@@ -1,8 +1,9 @@
 with Ada.Text_IO;
 with Gnat.Sockets;
 
-with network; use network;
 with recv_task_lib; use recv_task_lib;
+with serv_task_lib; use serv_task_lib;
+with network; use network;
 
 package accept_task_lib is
 
@@ -10,8 +11,10 @@ package accept_task_lib is
    package GS renames Gnat.Sockets;
 
    task type Accept_Task is
-      entry Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive);
-      entry Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive);
-   end Accept_Task; 
+      entry Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive; Serv_Task_Ptr_Init : Serv_Task_Ptr);
+      --entry Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive);
+   end Accept_Task;
+   
+   type Accept_Task_Ptr is access all Accept_Task;
 
 end accept_task_lib;

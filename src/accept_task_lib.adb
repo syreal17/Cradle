@@ -5,11 +5,13 @@ package body accept_task_lib is
       ClientStreams : Cxn_Streams;
       ClientStreams_I : Positive;
       Recvs : Recvs_Array;
+      Serv : Serv_Task_Ptr;
    begin
-      accept Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive) do
+      accept Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive; Serv_Task_Ptr_Init : Serv_Task_Ptr) do
          ServerSocket := ServerSocketInit;
          ClientStreams := CSs;
          ClientStreams_I := CSs_I;
+         Serv := Serv_Task_Ptr_Init;
       end Construct;
    
       loop
@@ -28,15 +30,17 @@ package body accept_task_lib is
          end;
       
          cons.Put_Line("INFO: About to start new recv");
-         --TODO: create new recv task with new ClientStream
-         Recvs(ClientStreams_I-1).Construct(ClientStreams(ClientStreams_I - 1));
+         --create new recv task with new ClientStream
+         Recvs(ClientStreams_I-1).Construct(ClientStreams(ClientStreams_I - 1), Serv);
          cons.Put_Line("INFO: Done starting new recv");
          
-         cons.Put_Line("INFO: Updating Clients in Accept Task");
-         accept Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive) do
-            CSs := ClientStreams;
-            CSs_I := ClientStreams_I;
-         end Update_Clients;
+         --cons.Put_Line("INFO: Updating Clients in Accept Task");
+         --accept Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive) do
+         --   CSs := ClientStreams;
+         --   CSs_I := ClientStreams_I;
+         --end Update_Clients;
+         --TODO: add rendezvous to server below
+         Serv.Update_Clients(ClientStreams, ClientStreams_I);
 
       end loop;
    end Accept_Task;

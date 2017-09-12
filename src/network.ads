@@ -2,8 +2,6 @@ with Gnat.Sockets;
 with Ada.Text_IO;
 with Ada.Exceptions;
 
-with recv_task_lib; use recv_task_lib;
-
 package network is
    package GS renames Gnat.Sockets;
    
@@ -11,7 +9,6 @@ package network is
    MAX_CXNS : constant Positive := 16;
    
    type Cxn_Streams is array (Positive range 1 .. MAX_CXNS) of aliased GS.Stream_Access;
-   type Recvs_Array is array (Positive range 1 .. MAX_CXNS) of Recv_Task;
    
    procedure Init_Chat_Server(
       ServerSocket : Out GS.Socket_Type;

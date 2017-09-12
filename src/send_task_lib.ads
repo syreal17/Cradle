@@ -5,7 +5,6 @@ with Ada.Containers.Indefinite_Vectors; use Ada.Containers;
 with Ada.Exceptions;
 
 with network; use network;
-with accept_task_lib; use accept_task_lib;
 
 package send_task_lib is
 
