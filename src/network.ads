@@ -10,6 +10,11 @@ package network is
    
    type Cxn_Streams is array (Positive range 1 .. MAX_CXNS) of aliased GS.Stream_Access;
    
+   type Cxn_Record is record
+      Ind: Positive;
+      Cxn: aliased GS.Stream_Access;
+   end record;
+   
    procedure Init_Chat_Server(
       ServerSocket : Out GS.Socket_Type;
       ServerSocketAddress : Out GS.Sock_Addr_Type);

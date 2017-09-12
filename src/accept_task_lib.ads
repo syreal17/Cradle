@@ -11,7 +11,7 @@ package accept_task_lib is
    package GS renames Gnat.Sockets;
 
    task type Accept_Task is
-      entry Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive; Serv_Task_Ptr_Init : Serv_Task_Ptr);
+      entry Construct(Server_Socket_Init: GS.Socket_Type; Serv_Task_Ptr_Init : Serv_Task_Ptr);
       --entry Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive);
    end Accept_Task;
    

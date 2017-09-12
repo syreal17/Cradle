@@ -1,45 +1,58 @@
 package body serv_task_lib is
+
+   function "=" (L, R : Cxn_Record) return Boolean is
+   begin
+      return L.Ind = R.Ind;   
+   end "=";
    
    task body Serv_Task is
-      ServerSocket : GS.Socket_Type;
-      ClientStreams : Cxn_Streams;
-      ClientStreams_I : Positive;
+      --ClientStreams_I : Positive;
       SendMsg_N : Positive;
+      ClientCxns: Cxns.Map;
    begin
-      accept Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive) do
-         ServerSocket := ServerSocketInit;
-         ClientStreams := CSs;
-         ClientStreams_I := CSs_I;
+      accept Construct do
+         null;
       end Construct;
       
       loop
          select
-            accept Update_Clients (CSs : Cxn_Streams; CSs_I : Positive) do
-               ClientStreams := CSs;
-               ClientStreams_I := CSs_I;
-            end Update_Clients;
+            accept Add_Client(Cxn_Record_Init: Cxn_Record) do
+                  ClientCxns.Insert(Cxn_Record_Init.Ind, Cxn_Record_Init);
+            end Add_Client;
          or
-            accept Relay_Msg (SendMsg : SU.Unbounded_String; C : Positive) do
+            accept Del_Client(Sender_I: Positive) do
+               cons.Put_Line("Serv_Task: In Del_Client!");
+               ClientCxns.Delete(Sender_I);
+            end Del_Client;
+         or
+            accept Relay_Msg (SendMsg : SU.Unbounded_String; Sender_I : Positive) do
                SendMsg_N := SU.Length(SendMsg);
                
                declare
-                  ClientStream : GS.Stream_Access;
+                  ClientStream : aliased GS.Stream_Access;
                   Msg : String(1..SendMsg_N);
+                  c: Cxns.Cursor := Cxns.First(ClientCxns);
                begin
                   for I in Msg'Range loop
                      Msg(I) := SU.Element(SendMsg, I);
                   end loop;
                   
-                  for I in 1..ClientStreams_I-1 loop
-                     if I /= C then
-                        ClientStream := ClientStreams(I);
+                  -- iterate with cursor over map
+                  while Cxns.Has_Element(c) loop
+                     if Cxns.Key(c) /= Sender_I then
+                        ClientStream := Cxns.Element(c).Cxn;
                         String'Write(ClientStream, Msg);
                      end if;
+                     Cxns.Next(c);
                   end loop;
                end;
             end Relay_Msg;
          end select;
       end loop;
+      
+   exception
+      when e : others =>
+         cons.Put_Line("Serv_Task: " & Ada.Exceptions.Exception_Name(e) & ": " & Ada.Exceptions.Exception_Message(e));      
    end Serv_Task;
    
 end serv_task_lib;

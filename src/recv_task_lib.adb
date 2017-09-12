@@ -1,14 +1,14 @@
 package body recv_task_lib is
 
    task body Recv_Task is
-      ClientStream : GS.Stream_Access;
+      ClientStream : aliased GS.Stream_Access;
       Serv : Serv_Task_Ptr;
-      C : Positive;
+      Sender_I : Positive;
    begin
-      accept Construct(CS : aliased GS.Stream_Access; Serv_Task_Ptr_Init : Serv_Task_Ptr; C_init : Positive) do
-         ClientStream := CS;
+      accept Construct(Serv_Task_Ptr_Init : Serv_Task_Ptr; Cxn_Record_Init: Cxn_Record) do
          Serv := Serv_Task_Ptr_Init;
-         C := C_Init;
+         ClientStream := Cxn_Record_Init.Cxn;
+         Sender_I := Cxn_Record_Init.Ind;
       end Construct;
       
       loop
@@ -32,9 +32,15 @@ package body recv_task_lib is
  
             ucons.Put_Line(RecvMsg);
             
-            Serv.Relay_Msg(RecvMsg,C);
+            Serv.Relay_Msg(RecvMsg, Sender_I);
          end;
       end loop;
+      
+   exception
+      when e: GS.Socket_Error =>
+         Serv.Del_Client(Sender_I);
+      when e: others =>
+         cons.Put_Line("Recv_Task: " & Ada.Exceptions.Exception_Name(e) & ": " & Ada.Exceptions.Exception_Message(e)); 
    end Recv_Task;
    
 end recv_task_lib;

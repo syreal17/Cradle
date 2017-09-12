@@ -15,18 +15,16 @@ procedure Main is
 
    ServerSocket : GS.Socket_Type;
    ServerSocketAddr : GS.Sock_Addr_Type;
-   ClientStreams : Cxn_Streams;
-   ClientStreams_I : Positive := 1;
    Acpt : Accept_Task;
    Serv : Serv_Task_Ptr;
 begin
    Init_Chat_Server(ServerSocket, ServerSocketAddr);
 
    Serv := new Serv_Task;
-   Serv.Construct(ServerSocket, ClientStreams, ClientStreams_I);
-   Acpt.Construct(ServerSocket, ClientStreams, ClientStreams_I, Serv);
+   Serv.Construct;
+   Acpt.Construct(ServerSocket, Serv);
 
    exception
       when e : others =>
-         cons.Put_Line(Ada.Exceptions.Exception_Name(e) & ": " & Ada.Exceptions.Exception_Message(e));
+         cons.Put_Line("main: " & Ada.Exceptions.Exception_Name(e) & ": " & Ada.Exceptions.Exception_Message(e));
 end Main;
