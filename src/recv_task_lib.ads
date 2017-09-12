@@ -15,7 +15,7 @@ package recv_task_lib is
    package cons renames Ada.Text_IO;
 
    task type Recv_Task is
-      entry Construct(CS : aliased GS.Stream_Access; Serv_Task_Ptr_Init : Serv_Task_Ptr);
+      entry Construct(CS : aliased GS.Stream_Access; Serv_Task_Ptr_Init : Serv_Task_Ptr; C_init : Positive);
    end Recv_Task;
    
    type Recvs_Array is array (Positive range 1 .. MAX_CXNS) of Recv_Task;

@@ -31,15 +31,11 @@ package body accept_task_lib is
       
          cons.Put_Line("INFO: About to start new recv");
          --create new recv task with new ClientStream
-         Recvs(ClientStreams_I-1).Construct(ClientStreams(ClientStreams_I - 1), Serv);
+         Recvs(ClientStreams_I-1).Construct(ClientStreams(ClientStreams_I - 1), Serv, ClientStreams_I - 1);
          cons.Put_Line("INFO: Done starting new recv");
          
-         --cons.Put_Line("INFO: Updating Clients in Accept Task");
-         --accept Update_Clients(CSs : out Cxn_Streams; CSs_I : out Positive) do
-         --   CSs := ClientStreams;
-         --   CSs_I := ClientStreams_I;
-         --end Update_Clients;
-         --TODO: add rendezvous to server below
+         --TODO: put ClientStreams_I increment here
+         --add rendezvous to server below
          Serv.Update_Clients(ClientStreams, ClientStreams_I);
 
       end loop;

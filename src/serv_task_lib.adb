@@ -19,7 +19,7 @@ package body serv_task_lib is
                ClientStreams_I := CSs_I;
             end Update_Clients;
          or
-            accept Relay_Msg (SendMsg : SU.Unbounded_String) do
+            accept Relay_Msg (SendMsg : SU.Unbounded_String; C : Positive) do
                SendMsg_N := SU.Length(SendMsg);
                
                declare
@@ -31,8 +31,10 @@ package body serv_task_lib is
                   end loop;
                   
                   for I in 1..ClientStreams_I-1 loop
-                     ClientStream := ClientStreams(I);
-                     String'Write(ClientStream, Msg);
+                     if I /= C then
+                        ClientStream := ClientStreams(I);
+                        String'Write(ClientStream, Msg);
+                     end if;
                   end loop;
                end;
             end Relay_Msg;

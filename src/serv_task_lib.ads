@@ -12,7 +12,7 @@ package serv_task_lib is
    task type Serv_Task is
       entry Construct(ServerSocketInit : GS.Socket_Type; CSs : Cxn_Streams; CSs_I : Positive);
       entry Update_Clients(CSs : Cxn_Streams; CSs_I : Positive);
-      entry Relay_Msg(SendMsg : SU.Unbounded_String);
+      entry Relay_Msg(SendMsg : SU.Unbounded_String; C : Positive);
    end Serv_Task;
    
    type Serv_Task_Ptr is access all Serv_Task;

@@ -3,10 +3,12 @@ package body recv_task_lib is
    task body Recv_Task is
       ClientStream : GS.Stream_Access;
       Serv : Serv_Task_Ptr;
+      C : Positive;
    begin
-      accept Construct(CS : aliased GS.Stream_Access; Serv_Task_Ptr_Init : Serv_Task_Ptr) do
+      accept Construct(CS : aliased GS.Stream_Access; Serv_Task_Ptr_Init : Serv_Task_Ptr; C_init : Positive) do
          ClientStream := CS;
          Serv := Serv_Task_Ptr_Init;
+         C := C_Init;
       end Construct;
       
       loop
@@ -17,20 +19,20 @@ package body recv_task_lib is
          begin
             
             loop
-               cons.Put_Line("INFO: Recv:before stream read");
+               --cons.Put_Line("INFO: Recv:before stream read");
                String'Read(ClientStream, O);
-               cons.Put_Line("INFO: Recv:after stream read");
+               --cons.Put_Line("INFO: Recv:after stream read");
  
+               SU.Append(RecvMsg, O);
+               
                if O(1) = LF then
                   exit;
                end if;
- 
-               SU.Append(RecvMsg, O);
             end loop;
  
             ucons.Put_Line(RecvMsg);
             
-            Serv.Relay_Msg(RecvMsg);
+            Serv.Relay_Msg(RecvMsg,C);
          end;
       end loop;
    end Recv_Task;
