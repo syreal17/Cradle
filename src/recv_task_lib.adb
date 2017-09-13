@@ -5,7 +5,10 @@ package body recv_task_lib is
       Serv : Serv_Task_Ptr;
       Sender_I : Positive;
    begin
-      accept Construct(Serv_Task_Ptr_Init : Serv_Task_Ptr; Cxn_Record_Init: Cxn_Record) do
+      accept Construct(
+      Serv_Task_Ptr_Init : Serv_Task_Ptr; 
+      Cxn_Record_Init: Cxn_Record) 
+      do
          Serv := Serv_Task_Ptr_Init;
          ClientStream := Cxn_Record_Init.Cxn;
          Sender_I := Cxn_Record_Init.Ind;

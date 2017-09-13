@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 with Ada.Characters.Latin_1; use Ada.Characters.Latin_1;
 with Ada.Exceptions;
+with Ada.Unchecked_Deallocation;
 
 with network; use network;
 with serv_task_lib; use serv_task_lib;
@@ -16,7 +17,9 @@ package recv_task_lib is
    package cons renames Ada.Text_IO;
 
    task type Recv_Task is
-      entry Construct(Serv_Task_Ptr_Init : Serv_Task_Ptr; Cxn_Record_Init: Cxn_Record);
+      entry Construct(
+      Serv_Task_Ptr_Init: Serv_Task_Ptr; 
+      Cxn_Record_Init: Cxn_Record);
    end Recv_Task;
    
    type Recvs_Array is array (Positive range 1 .. MAX_CXNS) of Recv_Task;

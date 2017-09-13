@@ -23,10 +23,10 @@ package body accept_task_lib is
             Accept_Chat_Cxn(ServerSocket, ClientSocket, ClientSocketAddr);
             ClientStream := GS.Stream(ClientSocket);
             
-            --TODO: create Cxn_Record
+            --create Cxn_Record
             Cxn.Ind := ClientStreams_I;
             Cxn.Cxn := ClientStream;
-            --TODO: move Serv rendz in here
+            --Serv rendezvous
             Serv.Add_Client(Cxn);
             
             --cons.Put_Line("INFO: About to start new recv");
