@@ -9,6 +9,7 @@ package body serv_task_lib is
       --ClientStreams_I : Positive;
       SendMsg_N : Positive;
       ClientCxns: Cxns.Map;
+      Debunk_Inds: List_of_Inds.Set;
    begin
       accept Construct do
          null;
@@ -16,13 +17,16 @@ package body serv_task_lib is
       
       loop
          select
-            accept Add_Client(Cxn_Record_Init: Cxn_Record) do
+            accept Add_Client(Cxn_Record_Init: Cxn_Record; Debunk_Inds_Out: out List_of_Inds.Set) do
                   ClientCxns.Insert(Cxn_Record_Init.Ind, Cxn_Record_Init);
+                  Debunk_Inds_Out := Debunk_Inds;
+                  Debunk_Inds.Clear;
             end Add_Client;
          or
             accept Del_Client(Sender_I: Positive) do
                cons.Put_Line("Serv_Task: In Del_Client!");
                ClientCxns.Delete(Sender_I);
+               Debunk_Inds.Insert(Sender_I);
             end Del_Client;
          or
             accept Relay_Msg (SendMsg : SU.Unbounded_String; Sender_I : Positive) do

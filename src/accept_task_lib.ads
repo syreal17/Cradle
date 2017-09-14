@@ -1,5 +1,7 @@
 with Ada.Text_IO;
 with Gnat.Sockets;
+with Ada.Containers.Ordered_Maps; use Ada.Containers;
+with Ada.Unchecked_Deallocation;
 
 with recv_task_lib; use recv_task_lib;
 with serv_task_lib; use serv_task_lib;
@@ -16,5 +18,12 @@ package accept_task_lib is
    end Accept_Task;
    
    type Accept_Task_Ptr is access all Accept_Task;
+   
+   --generic for creating a map
+   package Ind_to_RTP is new Ada.Containers.Ordered_Maps
+     (Key_Type => Positive,
+      Element_Type => Recv_Task_Ptr);
+      
+   procedure Free_Recv is new Ada.Unchecked_Deallocation(Recv_Task, Recv_Task_Ptr);
 
 end accept_task_lib;
